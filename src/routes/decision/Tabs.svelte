@@ -1,17 +1,29 @@
 <script>
   import { tabIndex } from "./stores.js";
-  import refreshPic from "$lib/images/arrows-rotate-solid.svg";
 
   export let items = [];
 
   let activeTabValue = 1;
+  let lastTabValue = [1];
+  let justBackTabbed = false;
+
+  
 
   tabIndex.subscribe((value) => {
+    if (justBackTabbed != true) {
+      lastTabValue.unshift(activeTabValue);
+    }
     activeTabValue = value;
+    justBackTabbed = false;
   });
 
-  function backToStart() {
-    tabIndex.set(1);
+  function backtab() {
+    justBackTabbed = true;
+    const targetTab = lastTabValue[0];
+    if (lastTabValue.length > 1) {
+      lastTabValue.shift();
+    }
+    tabIndex.set(targetTab);
   }
 </script>
 
@@ -34,15 +46,17 @@
               </h5>
             </div>
             <div class="col" style="max-width: min-content">
-              <button
-                class="btn btn-light float-end"
-                id="refreshDecision"
-                type="button"
-                aria-label="refresh"
-                on:click={() => backToStart()}
-              >
-                <img src={refreshPic} alt="refresh" style="height: 1.2rem" />
-              </button>
+              {#if activeTabValue != 1}
+                <button
+                  class="btn btn-light float-end"
+                  id="refreshDecision"
+                  type="button"
+                  aria-label="back"
+                  on:click={() => backtab()}
+                >
+                  ᐊ Back
+                </button>
+              {/if}
             </div>
           </div>
         </div>
